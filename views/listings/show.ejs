@@ -1,30 +1,360 @@
 <%= layout("/layouts/boilerplate") %>
-<div class="row mt-3">
-  <div class="col-8 offset-3">
-    <h3>Listing Details :</h3>
-  </div>
-  <div class="card col-6 offset-3 show-card">
-    <img
-      class="card-img-top show-img"
-      src="<%= listing.image %>"
-      alt="listing_image"
-    />
-    <div class="card-body">
-      <p class="card-text">
-        <b><%= listing.title %></b><br />
-        <%= listing.description %> <br />
-        &#8377; <%= listing.price.toLocaleString("en-IN") %><br />
-        <%= listing.location %> <br />
-        <%= listing.country %>
-      </p>
+
+<div class="page-header">
+  <div>
+    <h2 class="mb-1"><%= listing.title %></h2>
+    <div class="text-muted d-flex align-items-center gap-2 flex-wrap">
+      <span>
+        <i class="fa-solid fa-location-dot me-1"></i>
+        <%= listing.location %>, <%= listing.country %>
+      </span>
+      <span>·</span>
+      <span class="rating-pill">
+        <i class="fa-solid fa-star" style="color:#f59e0b"></i>
+        <%= (listing.ratingAverage || 0).toFixed(1) %>
+        <span class="text-muted">(<%= listing.ratingCount || 0 %> reviews)</span>
+      </span>
     </div>
   </div>
-  <br />
-<div class="btns">
-  <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
+</div>
 
-  <form method="POST" action="/listings/<%= listing._id%>?_method=DELETE">
-    <button class="btn btn-dark offset-3">Delete</button>
-  </form>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="show-hero">
+      <img class="show-img" src="<%= listing.image %>" alt="<%= listing.title %>" />
+    </div>
+
+    <div class="card ui-card about-section mt-4">
+      <div class="card-body">
+        <h5 class="mb-3">
+          <i class="fa-solid fa-circle-info text-brand me-2"></i>
+          About this place
+        </h5>
+        <p class="mb-4" style="line-height: 1.8;"><%= listing.description %></p>
+
+        <% if ((listing.amenities || []).length) { %>
+          <div class="divider"></div>
+          <h6 class="mb-3">
+            <i class="fa-solid fa-sparkles text-brand me-2"></i>
+            What this place offers
+          </h6>
+          <div class="d-flex flex-wrap gap-2">
+            <% for (let a of listing.amenities) { %>
+              <span class="amenity-badge">
+                <i class="fa-solid fa-check"></i> <%= a %>
+              </span>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="card ui-card mt-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="mb-0">
+            <i class="fa-solid fa-comments text-brand me-2"></i>
+            Reviews
+          </h5>
+          <span class="text-muted small">
+            <i class="fa-solid fa-circle-check me-1"></i>
+            Only verified guests can review
+          </span>
+        </div>
+
+        <% if (currentUser && currentUser.role === 'user') { %>
+          <form class="mb-4 p-3 rounded-3" style="background: rgba(0,0,0,0.02);" method="POST" action="/listings/<%= listing._id %>/reviews">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">Your Rating</label>
+                <select name="review[rating]" class="form-select" required>
+                  <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                  <option value="4">⭐⭐⭐⭐ (4)</option>
+                  <option value="3">⭐⭐⭐ (3)</option>
+                  <option value="2">⭐⭐ (2)</option>
+                  <option value="1">⭐ (1)</option>
+                </select>
+              </div>
+              <div class="col-md-9">
+                <label class="form-label">Your Review</label>
+                <input name="review[comment]" class="form-control" placeholder="Share your experience with other travelers..." required />
+              </div>
+              <div class="col-12">
+                <button class="btn btn-brand btn-sm">
+                  <i class="fa-solid fa-paper-plane me-1"></i> Submit Review
+                </button>
+              </div>
+            </div>
+          </form>
+        <% } else if (!currentUser) { %>
+          <div class="alert ui-alert alert-info mb-4">
+            <i class="fa-solid fa-circle-info"></i>
+            <a href="/login">Login</a> to share your experience
+          </div>
+        <% } %>
+
+        <% if (!reviews || !reviews.length) { %>
+          <div class="text-center py-4">
+            <i class="fa-solid fa-message fa-2x text-muted mb-2"></i>
+            <p class="text-muted mb-0">No reviews yet. Be the first to share your experience!</p>
+          </div>
+        <% } else { %>
+          <div class="d-flex flex-column">
+            <% for (let r of (reviews || [])) { %>
+              <div class="review-item">
+                <div class="review-header">
+                  <div class="review-avatar">
+                    <%= (r.user?.name || 'U').charAt(0).toUpperCase() %>
+                  </div>
+                  <div class="review-meta">
+                    <div class="review-author"><%= r.user?.name || 'Anonymous' %></div>
+                    <div class="review-date"><%= new Date(r.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></div>
+                  </div>
+                  <div class="review-rating">
+                    <% for (let i = 0; i < r.rating; i++) { %>
+                      <i class="fa-solid fa-star"></i>
+                    <% } %>
+                    <% for (let i = r.rating; i < 5; i++) { %>
+                      <i class="fa-regular fa-star" style="color: #d1d5db;"></i>
+                    <% } %>
+                  </div>
+                </div>
+                <div class="review-content"><%= r.comment %></div>
+              </div>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card ui-card booking-card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="price-display">
+            <span class="price">₹<%= listing.price.toLocaleString("en-IN") %></span>
+            <span class="unit">/ night</span>
+          </div>
+
+          <% if (currentUser && currentUser.role === 'user') { %>
+            <button 
+              class="btn btn-outline-brand btn-sm wishlist-btn" 
+              type="button" 
+              title="Save to wishlist"
+              data-listing-id="<%= listing._id %>"
+              data-in-wishlist="<%= isInWishlist %>"
+            >
+              <i class="<%= isInWishlist ? 'fa-solid' : 'fa-regular' %> fa-heart"></i> 
+              <%= isInWishlist ? 'Saved' : 'Save' %>
+            </button>
+          <% } %>
+        </div>
+
+        <div class="divider"></div>
+
+        <% if (!currentUser) { %>
+          <div class="text-center">
+            <p class="text-muted mb-3">Login to book this amazing place</p>
+            <a class="btn btn-brand w-100" href="/login">
+              <i class="fa-solid fa-right-to-bracket me-2"></i> Login to Book
+            </a>
+          </div>
+        <% } else if (currentUser.role === 'user') { %>
+          <% if (userBooking) { %>
+            <!-- User has an existing booking -->
+            <div class="alert alert-success mb-3" style="border-radius: 12px;">
+              <div class="d-flex align-items-center mb-2">
+                <i class="fa-solid fa-circle-check me-2 fa-lg"></i>
+                <strong>Already Booked!</strong>
+              </div>
+              <p class="mb-2 small">
+                <i class="fa-solid fa-calendar me-1"></i>
+                <%= new Date(userBooking.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %> - 
+                <%= new Date(userBooking.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+              </p>
+              <p class="mb-0 small text-muted">
+                Status: <span class="badge bg-<%= userBooking.status === 'confirmed' ? 'success' : 'warning' %>"><%= userBooking.status %></span>
+                <% if (userBooking.paymentStatus) { %>
+                  | Payment: <span class="badge bg-<%= userBooking.paymentStatus === 'paid' ? 'success' : 'warning' %>"><%= userBooking.paymentStatus %></span>
+                <% } %>
+              </p>
+            </div>
+            <a href="/dashboard" class="btn btn-outline-primary w-100">
+              <i class="fa-solid fa-eye me-2"></i> View in Dashboard
+            </a>
+          <% } else { %>
+            <!-- Booking form -->
+            <form method="POST" action="/listings/<%= listing._id %>/bookings" id="bookingForm">
+              <div class="row g-3">
+                <div class="col-6">
+                  <label class="form-label">
+                    <i class="fa-solid fa-calendar-plus me-1"></i> Check-in
+                  </label>
+                  <input name="booking[startDate]" id="startDate" type="date" class="form-control" required />
+                </div>
+                <div class="col-6">
+                  <label class="form-label">
+                    <i class="fa-solid fa-calendar-minus me-1"></i> Check-out
+                  </label>
+                  <input name="booking[endDate]" id="endDate" type="date" class="form-control" required />
+                </div>
+                
+                <!-- Price estimate -->
+                <div class="col-12" id="priceEstimate" style="display: none;">
+                  <div class="p-3 rounded-3" style="background: rgba(0,0,0,0.03);">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="text-muted">₹<%= listing.price.toLocaleString("en-IN") %> × <span id="nightCount">0</span> nights</span>
+                      <span id="subtotal">₹0</span>
+                    </div>
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between fw-bold">
+                      <span>Total</span>
+                      <span id="totalPrice">₹0</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-12">
+                  <button class="btn btn-brand w-100 mt-2" type="submit">
+                    <i class="fa-solid fa-lock me-2"></i> Reserve & Pay
+                  </button>
+                </div>
+              </div>
+            </form>
+            <p class="text-muted text-center small mt-3 mb-0">
+              <i class="fa-solid fa-shield-halved me-1"></i>
+              Secure payment powered by Razorpay
+            </p>
+          <% } %>
+          
+          <% if (bookedDates && bookedDates.length > 0) { %>
+            <div class="divider"></div>
+            <div class="booked-dates-info">
+              <h6 class="mb-2">
+                <i class="fa-solid fa-calendar-xmark me-2 text-danger"></i>
+                Unavailable Dates
+              </h6>
+              <div class="d-flex flex-wrap gap-1">
+                <% bookedDates.forEach(function(bd) { %>
+                  <span class="badge bg-light text-dark border" style="font-size: 0.75rem;">
+                    <%= new Date(bd.start).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %> - 
+                    <%= new Date(bd.end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                  </span>
+                <% }); %>
+              </div>
+            </div>
+          <% } %>
+        <% } else { %>
+          <div class="text-center">
+            <i class="fa-solid fa-user-tie fa-2x text-muted mb-2"></i>
+            <p class="text-muted mb-0">Hosts cannot book properties</p>
+          </div>
+        <% } %>
+
+        <% if (currentUser && currentUser.role === 'host' && listing.host && listing.host._id && currentUser._id && listing.host._id.toString() === currentUser._id.toString()) { %>
+          <div class="divider"></div>
+          <div class="btns">
+            <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark flex-grow-1">
+              <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+            </a>
+            <form method="POST" action="/listings/<%= listing._id%>?_method=DELETE" data-confirm="Are you sure you want to delete this listing? This action cannot be undone.">
+              <button class="btn btn-outline-danger" type="submit">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </form>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
 </div>
-</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const priceEstimate = document.getElementById('priceEstimate');
+    const nightCount = document.getElementById('nightCount');
+    const subtotal = document.getElementById('subtotal');
+    const totalPrice = document.getElementById('totalPrice');
+    const pricePerNight = <%= listing.price %>;
+    
+    // Booked dates from server
+    const bookedDates = <%- JSON.stringify(bookedDates || []) %>;
+    
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    if (startDateInput) startDateInput.min = today;
+    if (endDateInput) endDateInput.min = today;
+    
+    function isDateInRange(date, start, end) {
+        const d = new Date(date);
+        const s = new Date(start);
+        const e = new Date(end);
+        return d >= s && d <= e;
+    }
+    
+    function datesOverlap(start1, end1, start2, end2) {
+        return new Date(start1) <= new Date(end2) && new Date(end1) >= new Date(start2);
+    }
+    
+    function checkBookedDates() {
+        if (!startDateInput || !endDateInput) return true;
+        const start = startDateInput.value;
+        const end = endDateInput.value;
+        
+        if (!start || !end) return true;
+        
+        for (const booked of bookedDates) {
+            if (datesOverlap(start, end, booked.start, booked.end)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    function calculatePrice() {
+        if (!startDateInput || !endDateInput) return;
+        const start = new Date(startDateInput.value);
+        const end = new Date(endDateInput.value);
+        
+        if (!startDateInput.value || !endDateInput.value || end <= start) {
+            if (priceEstimate) priceEstimate.style.display = 'none';
+            return;
+        }
+        
+        // Check for overlap with booked dates
+        if (!checkBookedDates()) {
+            startDateInput.setCustomValidity('Selected dates overlap with existing booking');
+            if (priceEstimate) priceEstimate.style.display = 'none';
+            return;
+        } else {
+            startDateInput.setCustomValidity('');
+        }
+        
+        const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        const total = nights * pricePerNight;
+        
+        if (nightCount) nightCount.textContent = nights;
+        if (subtotal) subtotal.textContent = '₹' + total.toLocaleString('en-IN');
+        if (totalPrice) totalPrice.textContent = '₹' + total.toLocaleString('en-IN');
+        if (priceEstimate) priceEstimate.style.display = 'block';
+    }
+    
+    if (startDateInput) {
+        startDateInput.addEventListener('change', function() {
+            if (this.value) {
+                const nextDay = new Date(this.value);
+                nextDay.setDate(nextDay.getDate() + 1);
+                if (endDateInput) endDateInput.min = nextDay.toISOString().split('T')[0];
+            }
+            calculatePrice();
+        });
+    }
+    
+    if (endDateInput) {
+        endDateInput.addEventListener('change', calculatePrice);
+    }
+});
+</script>

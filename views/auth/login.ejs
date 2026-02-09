@@ -1,0 +1,72 @@
+<%= layout("/layouts/boilerplate") %>
+
+<div class="auth-hero">
+  <div class="mb-3">
+    <i class="fa-solid fa-right-to-bracket fa-2x text-brand"></i>
+  </div>
+  <h2 class="mb-1">Welcome back</h2>
+  <p class="text-muted mb-0">Sign in to continue your journey with Homio</p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-5 col-md-7">
+    <div class="card ui-card auth-card">
+      <div class="card-body">
+        <form method="POST" action="/login" class="needs-validation" novalidate>
+          <div class="mb-4">
+            <label class="form-label">
+              <i class="fa-solid fa-users me-1"></i> I am a
+            </label>
+            <select name="user[loginAs]" class="form-select">
+              <option value="user" selected>Traveler (Booking stays)</option>
+              <option value="host">Host (Listing properties)</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">
+              <i class="fa-solid fa-envelope me-1"></i> Email address
+            </label>
+            <input 
+              name="user[email]" 
+              type="email" 
+              class="form-control" 
+              placeholder="you@example.com" 
+              required 
+              autofocus
+            />
+            <div class="invalid-feedback">Please enter a valid email address</div>
+          </div>
+
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <label class="form-label mb-0">
+                <i class="fa-solid fa-lock me-1"></i> Password
+              </label>
+              <a href="/forgot-password" class="small text-muted">Forgot password?</a>
+            </div>
+            <input 
+              name="user[password]" 
+              type="password" 
+              class="form-control mt-2" 
+              placeholder="Enter your password" 
+              required 
+            />
+            <div class="invalid-feedback">Password is required</div>
+          </div>
+
+          <button class="btn btn-brand w-100 btn-lg">
+            <i class="fa-solid fa-arrow-right me-2"></i> Sign In
+          </button>
+          
+          <div class="text-center mt-4">
+            <p class="text-muted mb-0">
+              New to Homio? 
+              <a href="/register" class="fw-semibold">Create an account</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

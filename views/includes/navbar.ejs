@@ -1,20 +1,61 @@
-<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/"><i class="fa-duotone fa-solid fa-house"></i></a>
+<nav class="navbar navbar-expand-lg app-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <span class="brand-icon">
+        <i class="fa-solid fa-house"></i>
+      </span>
+      <span class="brand-text">Homio</span>
+    </a>
+    
     <button
-      class="navbar-toggler"
+      class="navbar-toggler border-0"
       type="button"
       data-bs-toggle="collapse"
-      data-bs-target="#navbarNavAltMarkup"
+      data-bs-target="#navbarMain"
+      aria-controls="navbarMain"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
     >
-      <span class="navbar-toggler-icon"></span>
+      <i class="fa-solid fa-bars"></i>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-link"  href="/">Home</a>
-        <a class="nav-link" href="/listings">All Listings</a>
-        <a class="nav-link" href="/listings/new">Add new Listing</a>
-        
+    
+    <div class="collapse navbar-collapse" id="navbarMain">
+      <div class="navbar-nav me-auto">
+        <a class="nav-link" href="/listings">
+          <i class="fa-solid fa-compass me-1"></i> Explore
+        </a>
+        <% if (currentUser && currentUser.role === 'host') { %>
+          <a class="nav-link" href="/listings/new">
+            <i class="fa-solid fa-plus me-1"></i> Add Property
+          </a>
+          <a class="nav-link" href="/host/dashboard">
+            <i class="fa-solid fa-chart-line me-1"></i> Host Dashboard
+          </a>
+        <% } %>
+        <% if (currentUser && currentUser.role === 'user') { %>
+          <a class="nav-link" href="/dashboard">
+            <i class="fa-solid fa-grid-2 me-1"></i> Dashboard
+          </a>
+        <% } %>
+      </div>
+
+      <div class="navbar-nav ms-auto align-items-center gap-2">
+        <% if (!currentUser) { %>
+          <a class="nav-link" href="/login">Login</a>
+          <a class="nav-btn nav-btn-primary" href="/register">
+            <i class="fa-solid fa-user-plus"></i> Sign up
+          </a>
+        <% } else { %>
+          <span class="user-greeting">
+            <i class="fa-solid fa-circle-user"></i>
+            Hi, <%= currentUser.name.split(' ')[0] %>
+          </span>
+          <form method="POST" action="/logout" class="d-flex m-0">
+            <button class="nav-btn nav-btn-outline" type="submit">
+              <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+          </form>
+        <% } %>
       </div>
     </div>
   </div>

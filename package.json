@@ -1,8 +1,10 @@
 {
   "name": "homio",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -10,11 +12,21 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.9.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "ejs-mate": "^4.0.0",
     "express": "^5.1.0",
     "joi": "^18.0.1",
+    "jsonwebtoken": "^9.0.3",
     "method-override": "^3.0.0",
-    "mongoose": "^8.19.1"
+    "mongoose": "^8.19.1",
+    "nodemailer": "^7.0.12",
+    "razorpay": "^2.9.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
   }
 }

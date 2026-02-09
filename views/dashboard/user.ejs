@@ -1,0 +1,189 @@
+<%= layout("/layouts/boilerplate") %>
+
+<div class="page-header">
+  <div>
+    <h2 class="mb-1">
+      <i class="fa-solid fa-grid-2 text-brand me-2"></i>
+      My Dashboard
+    </h2>
+    <p class="text-muted mb-0">Welcome back, <%= profile?.name %>! Manage your bookings and wishlist.</p>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+      <i class="fa-solid fa-circle-check"></i>
+    </div>
+    <div class="stat-card-value"><%= stats.confirmed %></div>
+    <div class="stat-card-label">Confirmed Bookings</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+      <i class="fa-solid fa-clock"></i>
+    </div>
+    <div class="stat-card-value"><%= stats.pending %></div>
+    <div class="stat-card-label">Pending Payment</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+      <i class="fa-solid fa-heart"></i>
+    </div>
+    <div class="stat-card-value" id="wishlist-stat-count"><%= wishlist.length %></div>
+    <div class="stat-card-label">Saved Places</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+      <i class="fa-solid fa-indian-rupee-sign"></i>
+    </div>
+    <div class="stat-card-value">₹<%= stats.totalSpent.toLocaleString('en-IN') %></div>
+    <div class="stat-card-label">Total Spent</div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card ui-card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fa-solid fa-suitcase text-brand me-2"></i>
+            My Bookings
+          </h5>
+          <span class="badge bg-light text-dark"><%= bookings.length %> total</span>
+        </div>
+
+        <% if(!bookings.length){ %>
+          <div class="text-center py-5">
+            <i class="fa-solid fa-suitcase-rolling fa-3x text-muted mb-3"></i>
+            <p class="text-muted mb-2">No bookings yet</p>
+            <p class="text-muted small mb-3">Start exploring amazing places to stay!</p>
+            <a href="/listings" class="btn btn-brand">
+              <i class="fa-solid fa-compass me-1"></i> Explore Listings
+            </a>
+          </div>
+        <% } else { %>
+          <div class="list-group">
+            <% for (let b of bookings) { %>
+              <div class="list-group-item d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                <div class="d-flex gap-3 align-items-start">
+                  <% if (b.listing?.image) { %>
+                    <img src="<%= b.listing.image %>" alt="<%= b.listing?.title %>" style="width: 80px; height: 60px; border-radius: 8px; object-fit: cover;" />
+                  <% } %>
+                  <div>
+                    <div class="fw-semibold">
+                      <a href="/listings/<%= b.listing?._id %>" class="text-decoration-none">
+                        <%= b.listing?.title || 'Listing' %>
+                      </a>
+                    </div>
+                    <div class="text-muted small mb-1">
+                      <i class="fa-solid fa-calendar-days me-1"></i>
+                      <%= new Date(b.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %> 
+                      → 
+                      <%= new Date(b.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap align-items-center">
+                      <span class="badge <%= b.status === 'cancelled' ? 'bg-secondary' : (b.status === 'pending' ? 'bg-warning' : 'bg-success') %>">
+                        <i class="fa-solid <%= b.status === 'cancelled' ? 'fa-circle-xmark' : (b.status === 'pending' ? 'fa-clock' : 'fa-circle-check') %> me-1"></i>
+                        <%= b.status %>
+                      </span>
+                      <% if (b.paymentStatus) { %>
+                        <span class="badge <%= b.paymentStatus === 'paid' ? 'bg-info' : (b.paymentStatus === 'refunded' ? 'bg-secondary' : 'bg-warning') %>">
+                          <i class="fa-solid <%= b.paymentStatus === 'paid' ? 'fa-check' : 'fa-indian-rupee-sign' %> me-1"></i>
+                          <%= b.paymentStatus %>
+                        </span>
+                      <% } %>
+                      <% if (b.totalAmount) { %>
+                        <span class="text-muted small">
+                          <strong>₹<%= b.totalAmount.toLocaleString('en-IN') %></strong>
+                        </span>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+                <% if (b.status === 'confirmed' && b.paymentStatus === 'paid') { %>
+                  <form method="POST" action="/listings/<%= b.listing?._id %>/bookings/<%= b._id %>/cancel" data-confirm="Are you sure you want to cancel this booking? Refund will be processed within 5-7 days.">
+                    <button class="btn btn-outline-danger btn-sm">
+                      <i class="fa-solid fa-xmark me-1"></i> Cancel
+                    </button>
+                  </form>
+                <% } %>
+              </div>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card ui-card mb-4">
+      <div class="card-body">
+        <h5 class="mb-3">
+          <i class="fa-solid fa-circle-user text-brand me-2"></i>
+          Profile
+        </h5>
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="review-avatar" style="width: 56px; height: 56px; font-size: 1.25rem;">
+            <%= (profile?.name || 'U').charAt(0).toUpperCase() %>
+          </div>
+          <div>
+            <div class="fw-semibold"><%= profile?.name %></div>
+            <div class="text-muted small"><%= profile?.email %></div>
+          </div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <span class="badge text-bg-light">
+            <i class="fa-solid fa-user me-1"></i> User Account
+          </span>
+          <span class="badge text-bg-light">
+            <i class="fa-solid fa-envelope-circle-check me-1"></i> Verified
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ui-card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fa-solid fa-heart text-brand me-2"></i>
+            Wishlist
+          </h5>
+          <span class="badge bg-light text-dark" id="wishlist-badge-count"><%= wishlist.length %></span>
+        </div>
+        <% if(!wishlist.length){ %>
+          <div class="text-center py-3">
+            <i class="fa-regular fa-heart fa-2x text-muted mb-2"></i>
+            <p class="text-muted small mb-2">No saved listings yet</p>
+            <a href="/listings" class="btn btn-outline-brand btn-sm">Browse Listings</a>
+          </div>
+        <% } else { %>
+          <div class="d-flex flex-column gap-2" id="wishlist-container">
+            <% for (let l of wishlist) { %>
+              <div class="mini-card-wrapper d-flex align-items-center gap-2" data-listing-id="<%= l._id %>">
+                <a class="text-decoration-none flex-grow-1" href="/listings/<%= l._id %>">
+                  <div class="mini-card">
+                    <img src="<%= l.image %>" alt="<%= l.title %>" />
+                    <div>
+                      <div class="mini-card-title"><%= l.title %></div>
+                      <div class="mini-card-subtitle">₹<%= l.price?.toLocaleString('en-IN') %>/night</div>
+                    </div>
+                  </div>
+                </a>
+                <button 
+                  class="btn btn-sm btn-outline-danger wishlist-remove-btn" 
+                  type="button" 
+                  title="Remove from wishlist"
+                  data-listing-id="<%= l._id %>"
+                >
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

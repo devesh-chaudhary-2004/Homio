@@ -1,0 +1,94 @@
+<%= layout("/layouts/boilerplate") %>
+
+<section class="home-hero">
+  <div class="row g-4 align-items-center">
+    <div class="col-lg-7">
+      <h1 class="home-title mb-3">Discover your perfect<br/>getaway with Homio</h1>
+      <p class="home-subtitle mb-4">Book unique homes, experiences, and places around the world. Your next adventure starts here.</p>
+
+      <div class="search-form">
+        <form class="row g-3" method="GET" action="/listings">
+          <div class="col-md-5">
+            <label class="form-label">
+              <i class="fa-solid fa-location-dot text-brand me-1"></i> Where to?
+            </label>
+            <input class="form-control" name="location" placeholder="Search by city or country" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">
+              <i class="fa-solid fa-indian-rupee-sign text-muted me-1"></i> Min Price
+            </label>
+            <input class="form-control" name="minPrice" type="number" placeholder="₹0" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">
+              <i class="fa-solid fa-indian-rupee-sign text-muted me-1"></i> Max Price
+            </label>
+            <input class="form-control" name="maxPrice" type="number" placeholder="₹50,000" />
+          </div>
+          <div class="col-12 d-flex gap-2 mt-3">
+            <button class="btn btn-brand">
+              <i class="fa-solid fa-magnifying-glass me-2"></i> Search
+            </button>
+            <a class="btn btn-outline-secondary" href="/listings">
+              <i class="fa-solid fa-border-all me-2"></i> Explore all
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-5 d-none d-lg-block">
+      <div class="home-hero-image">
+        <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80" alt="Beautiful home" class="img-fluid rounded-4 shadow-lg" style="max-height: 400px; object-fit: cover; width: 100%;" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="page-header mt-5">
+  <div>
+    <h3 class="mb-1">
+      <i class="fa-solid fa-fire text-brand me-2"></i> Featured stays
+    </h3>
+    <p class="text-muted mb-0">Handpicked properties for your perfect trip</p>
+  </div>
+  <div>
+    <a class="btn btn-outline-secondary btn-sm" href="/listings">
+      View all <i class="fa-solid fa-arrow-right ms-1"></i>
+    </a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <% for (let listing of featured) { %>
+    <div class="col-lg-4 col-md-6">
+      <a href="/listings/<%= listing._id %>" class="listing-link">
+        <div class="card listing-card">
+          <div class="listing-card-img-wrapper">
+            <img class="card-img-top" src="<%= listing.image %>" alt="<%= listing.title %>" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <div class="listing-card-title"><%= listing.title %></div>
+                <div class="listing-card-location">
+                  <i class="fa-solid fa-location-dot me-1"></i>
+                  <%= listing.location %>, <%= listing.country %>
+                </div>
+              </div>
+              <span class="rating-pill">
+                <i class="fa-solid fa-star" style="color:#f59e0b"></i>
+                <%= (listing.ratingAverage || 0).toFixed(1) %>
+              </span>
+            </div>
+            <div class="listing-card-price">
+              <span class="price">₹<%= listing.price?.toLocaleString('en-IN') %></span>
+              <span class="unit">/night</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  <% } %>
+</div>

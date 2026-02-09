@@ -1,0 +1,89 @@
+<%= layout("/layouts/boilerplate") %>
+
+<div class="auth-hero">
+  <div class="mb-3">
+    <i class="fa-solid fa-user-plus fa-2x text-brand"></i>
+  </div>
+  <h2 class="mb-1">Create your account</h2>
+  <p class="text-muted mb-0">Join Homio as a traveler or start hosting your property</p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8">
+    <div class="card ui-card auth-card">
+      <div class="card-body">
+        <form method="POST" action="/register" class="needs-validation" novalidate>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fa-solid fa-user me-1"></i> Full Name
+                </label>
+                <input 
+                  name="user[name]" 
+                  type="text" 
+                  class="form-control" 
+                  placeholder="John Doe" 
+                  required 
+                  autofocus
+                />
+                <div class="invalid-feedback">Please enter your name</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fa-solid fa-users me-1"></i> I want to
+                </label>
+                <select name="user[role]" class="form-select" required>
+                  <option value="user" selected>Book stays (User)</option>
+                  <option value="host">List properties (Host)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fa-solid fa-envelope me-1"></i> Email address
+            </label>
+            <input 
+              name="user[email]" 
+              type="email" 
+              class="form-control" 
+              placeholder="you@example.com" 
+              required 
+            />
+            <div class="invalid-feedback">Please enter a valid email address</div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">
+              <i class="fa-solid fa-lock me-1"></i> Password
+            </label>
+            <input 
+              name="user[password]" 
+              type="password" 
+              class="form-control" 
+              placeholder="Minimum 6 characters" 
+              minlength="6" 
+              required 
+            />
+            <div class="invalid-feedback">Password must be at least 6 characters</div>
+          </div>
+
+          <button class="btn btn-brand w-100 btn-lg">
+            <i class="fa-solid fa-rocket me-2"></i> Create Account
+          </button>
+          
+          <div class="text-center mt-4">
+            <p class="text-muted mb-0">
+              Already have an account? 
+              <a href="/login" class="fw-semibold">Sign in</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

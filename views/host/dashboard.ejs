@@ -1,0 +1,196 @@
+<%= layout("/layouts/boilerplate") %>
+
+<div class="page-header">
+  <div>
+    <h2 class="mb-1">
+      <i class="fa-solid fa-chart-line text-brand me-2"></i>
+      Host Dashboard
+    </h2>
+    <p class="text-muted mb-0">Welcome back! Manage your properties and track your earnings.</p>
+  </div>
+  <div>
+    <a class="btn btn-brand" href="/listings/new">
+      <i class="fa-solid fa-plus me-2"></i> Add Property
+    </a>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+      <i class="fa-solid fa-house"></i>
+    </div>
+    <div class="stat-card-value"><%= stats.totalListings %></div>
+    <div class="stat-card-label">Properties Listed</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+      <i class="fa-solid fa-calendar-check"></i>
+    </div>
+    <div class="stat-card-value"><%= stats.totalBookings %></div>
+    <div class="stat-card-label">Confirmed Bookings</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+      <i class="fa-solid fa-clock"></i>
+    </div>
+    <div class="stat-card-value"><%= stats.pendingBookings %></div>
+    <div class="stat-card-label">Pending Payment</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+      <i class="fa-solid fa-indian-rupee-sign"></i>
+    </div>
+    <div class="stat-card-value">₹<%= stats.totalEarnings.toLocaleString('en-IN') %></div>
+    <div class="stat-card-label">Total Earnings</div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card ui-card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fa-solid fa-building text-brand me-2"></i>
+            My Properties
+          </h5>
+          <span class="badge bg-light text-dark"><%= myListings.length %> listed</span>
+        </div>
+        <% if(!myListings.length){ %>
+          <div class="text-center py-5">
+            <i class="fa-solid fa-house-circle-plus fa-3x text-muted mb-3"></i>
+            <p class="text-muted mb-2">No properties listed yet</p>
+            <p class="text-muted small mb-3">Start hosting and earning by listing your first property!</p>
+            <a href="/listings/new" class="btn btn-brand">
+              <i class="fa-solid fa-plus me-1"></i> Create Your First Listing
+            </a>
+          </div>
+        <% } else { %>
+          <div class="row g-3">
+            <% for(let l of myListings){ %>
+              <div class="col-md-6">
+                <a class="listing-link" href="/listings/<%= l._id %>">
+                  <div class="card listing-card">
+                    <div class="listing-card-img-wrapper">
+                      <img class="card-img-top" src="<%= l.image %>" alt="<%= l.title %>" loading="lazy" />
+                    </div>
+                    <div class="card-body">
+                      <div class="listing-card-title"><%= l.title %></div>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="listing-card-price">
+                          <span class="price">₹<%= l.price?.toLocaleString('en-IN') %></span>
+                          <span class="unit">/night</span>
+                        </div>
+                        <div class="text-muted small">
+                          <i class="fa-solid fa-star text-warning me-1"></i>
+                          <%= (l.ratingAverage || 0).toFixed(1) %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card ui-card mb-4">
+      <div class="card-body">
+        <h5 class="mb-3">
+          <i class="fa-solid fa-wallet text-brand me-2"></i>
+          Earnings Summary
+        </h5>
+        <div class="text-center py-3">
+          <div class="text-muted small mb-1">Total Earnings (All Time)</div>
+          <div class="display-5 fw-bold text-brand">₹<%= stats.totalEarnings.toLocaleString('en-IN') %></div>
+        </div>
+        <div class="divider"></div>
+        <div class="p-3 rounded-3 mb-3" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));">
+          <div class="text-muted small mb-1">
+            <i class="fa-solid fa-calendar me-1"></i> This Month
+          </div>
+          <div class="h4 mb-0 fw-bold" style="color: #6366f1;">
+            ₹<%= stats.thisMonthEarnings.toLocaleString('en-IN') %>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between text-muted small">
+          <span><i class="fa-solid fa-house me-1"></i> Total Properties</span>
+          <span class="fw-semibold"><%= stats.totalListings %></span>
+        </div>
+        <div class="d-flex justify-content-between text-muted small mt-2">
+          <span><i class="fa-solid fa-check-circle me-1"></i> Confirmed Bookings</span>
+          <span class="fw-semibold"><%= stats.totalBookings %></span>
+        </div>
+        <div class="d-flex justify-content-between text-muted small mt-2">
+          <span><i class="fa-solid fa-clock me-1"></i> Pending Payments</span>
+          <span class="fw-semibold"><%= stats.pendingBookings %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ui-card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fa-solid fa-bell text-brand me-2"></i>
+            Recent Bookings
+          </h5>
+          <span class="badge bg-light text-dark"><%= bookingRequests.length %></span>
+        </div>
+        <% if(!bookingRequests.length){ %>
+          <div class="text-center py-4">
+            <i class="fa-solid fa-inbox fa-2x text-muted mb-2"></i>
+            <p class="text-muted small mb-0">No bookings yet</p>
+          </div>
+        <% } else { %>
+          <div class="list-group">
+            <% for (let b of bookingRequests.slice(0, 5)) { %>
+              <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="fw-semibold">
+                    <a href="/listings/<%= b.listing?._id %>" class="text-decoration-none">
+                      <%= b.listing?.title %>
+                    </a>
+                  </div>
+                  <span class="badge <%= b.status === 'confirmed' && b.paymentStatus === 'paid' ? 'bg-success' : 'bg-warning' %>">
+                    <% if (b.status === 'confirmed' && b.paymentStatus === 'paid') { %>
+                      <i class="fa-solid fa-check me-1"></i> Paid
+                    <% } else { %>
+                      <i class="fa-solid fa-clock me-1"></i> Pending
+                    <% } %>
+                  </span>
+                </div>
+                <div class="text-muted small mt-1">
+                  <i class="fa-solid fa-user me-1"></i> <%= b.user?.name %>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                  <span class="text-muted small">
+                    <i class="fa-solid fa-calendar me-1"></i>
+                    <%= new Date(b.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %> 
+                    → 
+                    <%= new Date(b.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                  </span>
+                  <% if (b.totalAmount) { %>
+                    <span class="fw-bold text-success small">
+                      ₹<%= b.totalAmount.toLocaleString('en-IN') %>
+                    </span>
+                  <% } %>
+                </div>
+              </div>
+            <% } %>
+          </div>
+          <% if (bookingRequests.length > 5) { %>
+            <div class="text-center mt-3">
+              <span class="text-muted small">+ <%= bookingRequests.length - 5 %> more bookings</span>
+            </div>
+          <% } %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,29 +1,103 @@
 <%= layout("/layouts/boilerplate") %>
-<body>
-  <h3>All Listings</h3>
-  <!-- <form method="GET" action="/listings/new">
-        <button> Create New Listing</button>
-    </form> -->
-  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
-    <% for(let listing of allListings){ %>
-        <a href="/listings/<%= listing._id %>" class="listing-link">
-        <div class="card col">
-      <img
-        class="card-img-top"
-        src="<%= listing.image %>"
-        alt="listing_image"
-        style="height:20rem"
-      />
-      <div class="card-img-overlay"></div>
-      <div class="card-body">
-        <p class="card-text">
-          <b><%= listing.title %> </b> <br>
-          &#8377; <%=listing.price.toLocaleString("en-IN")%>/night
-        </p>
-      </div>
-    </div>
-        </a>
-    <%}%>
-  </div>
 
-</body>
+<div class="page-header">
+  <div>
+    <h2 class="mb-1">
+      <i class="fa-solid fa-compass text-brand me-2"></i> Explore stays
+    </h2>
+    <p class="text-muted mb-0">Discover amazing places to stay around the world</p>
+  </div>
+</div>
+
+<div class="card ui-card mb-4">
+  <div class="card-body">
+    <form class="row g-3 align-items-end" method="GET" action="/listings">
+      <div class="col-lg-3 col-md-6">
+        <label class="form-label">
+          <i class="fa-solid fa-location-dot text-brand me-1"></i> Location
+        </label>
+        <input class="form-control" name="location" placeholder="City or country" value="<%= q?.location || '' %>" />
+      </div>
+      <div class="col-lg-2 col-md-3">
+        <label class="form-label">Min price</label>
+        <input class="form-control" name="minPrice" type="number" placeholder="₹0" value="<%= q?.minPrice || '' %>" />
+      </div>
+      <div class="col-lg-2 col-md-3">
+        <label class="form-label">Max price</label>
+        <input class="form-control" name="maxPrice" type="number" placeholder="₹50,000" value="<%= q?.maxPrice || '' %>" />
+      </div>
+      <div class="col-lg-2 col-md-4">
+        <label class="form-label">Min rating</label>
+        <select class="form-select" name="minRating">
+          <option value="" <%= !q?.minRating ? 'selected' : '' %>>Any rating</option>
+          <option value="4" <%= q?.minRating == 4 ? 'selected' : '' %>>4+ ⭐</option>
+          <option value="3" <%= q?.minRating == 3 ? 'selected' : '' %>>3+ ⭐</option>
+          <option value="2" <%= q?.minRating == 2 ? 'selected' : '' %>>2+ ⭐</option>
+        </select>
+      </div>
+      <div class="col-lg-2 col-md-4">
+        <label class="form-label">Sort by</label>
+        <select class="form-select" name="sort">
+          <option value="newest" <%= (q?.sort || 'newest') === 'newest' ? 'selected' : '' %>>Newest first</option>
+          <option value="price_asc" <%= q?.sort === 'price_asc' ? 'selected' : '' %>>Price: Low to high</option>
+          <option value="price_desc" <%= q?.sort === 'price_desc' ? 'selected' : '' %>>Price: High to low</option>
+          <option value="rating_desc" <%= q?.sort === 'rating_desc' ? 'selected' : '' %>>Top rated</option>
+        </select>
+      </div>
+      <div class="col-lg-1 col-md-4 d-flex gap-2">
+        <button class="btn btn-brand w-100" title="Search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
+      <div class="col-12 d-flex gap-2 mt-1">
+        <a class="btn btn-outline-secondary btn-sm" href="/listings">
+          <i class="fa-solid fa-rotate-left me-1"></i> Reset filters
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<% if (allListings && allListings.length === 0) { %>
+  <div class="text-center py-5">
+    <div class="mb-3">
+      <i class="fa-solid fa-house-circle-xmark fa-4x text-muted"></i>
+    </div>
+    <h4 class="text-muted">No listings found</h4>
+    <p class="text-muted">Try adjusting your search filters</p>
+    <a href="/listings" class="btn btn-brand mt-2">View all listings</a>
+  </div>
+<% } else { %>
+  <div class="row g-4">
+    <% for(let listing of allListings){ %>
+      <div class="col-lg-4 col-md-6">
+        <a href="/listings/<%= listing._id %>" class="listing-link">
+          <div class="card listing-card">
+            <div class="listing-card-img-wrapper">
+              <img class="card-img-top" src="<%= listing.image %>" alt="<%= listing.title %>" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start gap-2">
+                <div>
+                  <div class="listing-card-title"><%= listing.title %></div>
+                  <div class="listing-card-location">
+                    <i class="fa-solid fa-location-dot me-1"></i>
+                    <%= listing.location %>, <%= listing.country %>
+                  </div>
+                </div>
+                <span class="rating-pill" title="Rating">
+                  <i class="fa-solid fa-star" style="color:#f59e0b"></i>
+                  <%= (listing.ratingAverage || 0).toFixed(1) %>
+                </span>
+              </div>
+              <div class="listing-card-price">
+                <span class="price">₹<%= listing.price.toLocaleString("en-IN") %></span>
+                <span class="unit">/night</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    <% } %>
+  </div>
+<% } %>

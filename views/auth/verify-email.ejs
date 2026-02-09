@@ -1,0 +1,63 @@
+<%= layout("/layouts/boilerplate") %>
+
+<div class="auth-hero">
+  <div class="mb-3">
+    <i class="fa-solid fa-envelope-circle-check fa-2x text-brand"></i>
+  </div>
+  <h2 class="mb-1">Verify your email</h2>
+  <p class="text-muted mb-0">We sent a 6-digit confirmation code to <span class="fw-semibold"><%= email %></span></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-5 col-md-7">
+    <div class="card ui-card auth-card">
+      <div class="card-body">
+        <form method="POST" action="/verify-email" class="needs-validation" novalidate>
+          <input type="hidden" name="verify[email]" value="<%= email %>" />
+          <input type="hidden" name="verify[role]" value="<%= typeof role !== 'undefined' ? role : 'user' %>" />
+
+          <div class="mb-4">
+            <label class="form-label">
+              <i class="fa-solid fa-key me-1"></i> Confirmation Code
+            </label>
+            <input
+              name="verify[code]"
+              class="form-control text-center"
+              style="font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: 600;"
+              inputmode="numeric"
+              pattern="\d{6}"
+              maxlength="6"
+              placeholder="000000"
+              required
+              autofocus
+            />
+            <div class="invalid-feedback">Please enter the 6-digit code</div>
+            <div class="form-text text-center mt-2">
+              <i class="fa-solid fa-clock me-1"></i>
+              Code expires in 10 minutes
+            </div>
+          </div>
+
+          <button class="btn btn-brand w-100 btn-lg">
+            <i class="fa-solid fa-check-circle me-2"></i> Verify Email
+          </button>
+        </form>
+
+        <div class="divider"></div>
+
+        <div class="d-flex align-items-center justify-content-between">
+          <form method="POST" action="/verify-email/resend" class="m-0">
+            <input type="hidden" name="email" value="<%= email %>" />
+            <input type="hidden" name="role" value="<%= typeof role !== 'undefined' ? role : 'user' %>" />
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
+              <i class="fa-solid fa-rotate-right me-1"></i> Resend Code
+            </button>
+          </form>
+          <a class="btn btn-link btn-sm text-muted" href="/register">
+            <i class="fa-solid fa-arrow-left me-1"></i> Change email
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

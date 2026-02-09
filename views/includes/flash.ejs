@@ -1,0 +1,15 @@
+<% if (flash && flash.message) { %>
+  <div class="alert ui-alert alert-<%= flash.type || 'info' %> alert-dismissible fade show" role="alert">
+    <% if (flash.type === 'success') { %>
+      <i class="fa-solid fa-circle-check"></i>
+    <% } else if (flash.type === 'danger') { %>
+      <i class="fa-solid fa-circle-exclamation"></i>
+    <% } else if (flash.type === 'warning') { %>
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    <% } else { %>
+      <i class="fa-solid fa-circle-info"></i>
+    <% } %>
+    <span><%= flash.message %></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>

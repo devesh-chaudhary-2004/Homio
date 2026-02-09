@@ -1,8 +1,23 @@
-<%=  layout("/layouts/boilerplate") %>
-<div class="row mt-3">
-<div class="alert alert-danger col-6 offset-3" role="alert">
-<!-- <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg> -->
- <p class="alert-heading"><%= message %></p>
+<%= layout("/layouts/boilerplate") %>
 
-</div>
+<div class="row justify-content-center mt-5">
+  <div class="col-lg-6 col-md-8 text-center">
+    <div class="mb-4">
+      <i class="fa-solid fa-triangle-exclamation fa-4x text-brand"></i>
+    </div>
+    <h2 class="mb-3">Oops! Something went wrong</h2>
+    <div class="card ui-card">
+      <div class="card-body">
+        <p class="mb-0 text-muted"><%= message %></p>
+      </div>
+    </div>
+    <div class="mt-4">
+      <a href="/" class="btn btn-brand">
+        <i class="fa-solid fa-house me-2"></i> Back to Home
+      </a>
+      <a href="/listings" class="btn btn-outline-secondary ms-2">
+        <i class="fa-solid fa-compass me-2"></i> Explore Listings
+      </a>
+    </div>
+  </div>
 </div>

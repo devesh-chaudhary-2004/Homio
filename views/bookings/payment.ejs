@@ -1,0 +1,217 @@
+<% layout('/layouts/boilerplate') %>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Booking Summary Card -->
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-header bg-white border-0 py-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-receipt fa-2x text-primary me-3"></i>
+                        <div>
+                            <h3 class="mb-0 fw-bold">Complete Your Booking</h3>
+                            <p class="text-muted mb-0">Review and confirm your reservation</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4">
+                    <div class="row">
+                        <!-- Listing Info -->
+                        <div class="col-md-5 mb-4 mb-md-0">
+                            <div class="position-relative">
+                                <img 
+                                    src="<%= listing.image && listing.image.url ? listing.image.url : 'https://via.placeholder.com/400x300?text=No+Image' %>" 
+                                    alt="<%= listing.title %>"
+                                    class="img-fluid rounded-3 shadow-sm"
+                                    style="width: 100%; height: 200px; object-fit: cover;"
+                                >
+                                <span class="badge bg-primary position-absolute top-0 end-0 m-2">
+                                    <i class="fas fa-star me-1"></i> <%= listing.avgRating ? listing.avgRating.toFixed(1) : 'New' %>
+                                </span>
+                            </div>
+                            <h5 class="mt-3 fw-bold"><%= listing.title %></h5>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                <%= listing.location %>, <%= listing.country %>
+                            </p>
+                        </div>
+                        
+                        <!-- Booking Details -->
+                        <div class="col-md-7">
+                            <div class="booking-details bg-light rounded-3 p-4">
+                                <h5 class="fw-bold mb-3">
+                                    <i class="fas fa-calendar-check me-2 text-primary"></i>
+                                    Booking Details
+                                </h5>
+                                
+                                <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                                    <div>
+                                        <p class="text-muted mb-1 small">Check-in</p>
+                                        <p class="fw-bold mb-0">
+                                            <i class="fas fa-arrow-right-to-bracket me-2 text-success"></i>
+                                            <%= new Date(booking.startDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                        </p>
+                                    </div>
+                                    <div class="text-center">
+                                        <span class="badge bg-primary px-3 py-2">
+                                            <i class="fas fa-moon me-1"></i> <%= nights %> night<%= nights > 1 ? 's' : '' %>
+                                        </span>
+                                    </div>
+                                    <div class="text-end">
+                                        <p class="text-muted mb-1 small">Check-out</p>
+                                        <p class="fw-bold mb-0">
+                                            <i class="fas fa-arrow-right-from-bracket me-2 text-danger"></i>
+                                            <%= new Date(booking.endDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Price Breakdown -->
+                                <h6 class="fw-bold mb-3">
+                                    <i class="fas fa-indian-rupee-sign me-2 text-primary"></i>
+                                    Price Breakdown
+                                </h6>
+                                
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">₹<%= listing.price.toLocaleString('en-IN') %> × <%= nights %> night<%= nights > 1 ? 's' : '' %></span>
+                                    <span>₹<%= (listing.price * nights).toLocaleString('en-IN') %></span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Service fee</span>
+                                    <span class="text-success">₹0 <small>(Waived)</small></span>
+                                </div>
+                                
+                                <hr>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold fs-5">Total</span>
+                                    <span class="fw-bold fs-4 text-primary">₹<%= booking.totalAmount.toLocaleString('en-IN') %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-white border-0 p-4">
+                    <!-- Payment Button -->
+                    <button id="payBtn" class="btn btn-primary btn-lg w-100 py-3">
+                        <i class="fas fa-lock me-2"></i>
+                        Pay ₹<%= booking.totalAmount.toLocaleString('en-IN') %> Securely
+                    </button>
+                    
+                    <div class="text-center mt-3">
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-shield-alt me-1 text-success"></i>
+                            Your payment is secured by Razorpay
+                        </p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <img src="https://cdn.razorpay.com/static/assets/logo/payment.svg" alt="Payment Methods" height="20">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cancellation Policy -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-info-circle me-2 text-info"></i>
+                        Cancellation Policy
+                    </h6>
+                    <p class="text-muted mb-0 small">
+                        Free cancellation before check-in. Cancel before your trip starts to get a full refund.
+                        If you cancel after booking is confirmed, refund will be processed within 5-7 business days.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Razorpay Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const payBtn = document.getElementById('payBtn');
+    
+    const options = {
+        key: '<%= razorpayKeyId %>',
+        amount: <%= booking.totalAmount * 100 %>,
+        currency: 'INR',
+        name: 'Homio',
+        description: 'Booking for <%= listing.title %>',
+        image: 'https://via.placeholder.com/150?text=H',
+        order_id: '<%= razorpayOrderId %>',
+        handler: function(response) {
+            // Create form and submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/listings/<%= listing._id %>/bookings/verify-payment';
+            
+            const fields = {
+                'razorpay_order_id': response.razorpay_order_id,
+                'razorpay_payment_id': response.razorpay_payment_id,
+                'razorpay_signature': response.razorpay_signature,
+                'booking_id': '<%= booking._id %>'
+            };
+            
+            for (const key in fields) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = fields[key];
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        },
+        prefill: {
+            name: '<%= user.name %>',
+            email: '<%= user.email %>'
+        },
+        notes: {
+            listing_id: '<%= listing._id %>',
+            booking_id: '<%= booking._id %>'
+        },
+        theme: {
+            color: '#fe424d'
+        },
+        modal: {
+            ondismiss: function() {
+                // User closed the payment modal
+                if (confirm('Are you sure you want to cancel this payment?')) {
+                    window.location.href = '/listings/<%= listing._id %>';
+                }
+            }
+        }
+    };
+    
+    const rzp = new Razorpay(options);
+    
+    rzp.on('payment.failed', function(response) {
+        // Handle payment failure
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/listings/<%= listing._id %>/bookings/payment-failed';
+        
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'booking_id';
+        input.value = '<%= booking._id %>';
+        form.appendChild(input);
+        
+        document.body.appendChild(form);
+        form.submit();
+    });
+    
+    payBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        payBtn.disabled = true;
+        payBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        rzp.open();
+    });
+});
+</script>
