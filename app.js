@@ -7,7 +7,7 @@ const cookieParser = require("cookie-parser");
 
 require("./config/env");
 const { connectDB } = require("./config/db");
-const PORT = process.env.PORT || 3000;
+const { PORT } = require("./config/env");
 
 
 const ExpressError = require("./utils/ExpressError.js");
