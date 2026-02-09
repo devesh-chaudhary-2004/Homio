@@ -7,7 +7,8 @@ const cookieParser = require("cookie-parser");
 
 require("./config/env");
 const { connectDB } = require("./config/db");
-const { PORT } = require("./config/env");
+const PORT = process.env.PORT || 3000;
+
 
 const ExpressError = require("./utils/ExpressError.js");
 const { attachUser } = require("./middleware/auth");
