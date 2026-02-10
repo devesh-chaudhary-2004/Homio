@@ -1,35 +1,21 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-function getTransport() {
-  const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS } = process.env;
-  
-  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
+function getResendClient() {
+  const { RESEND_API_KEY } = process.env;
+  if (!RESEND_API_KEY) {
     return null;
   }
-
-  return nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: Number(SMTP_PORT),
-    secure: String(SMTP_SECURE).toLowerCase() === "true",
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS,
-    },
-    // Timeouts to prevent hanging requests
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
-  });
+  return new Resend(RESEND_API_KEY);
 }
 
 async function sendOtpEmail({ to, code }) {
-  const transport = getTransport();
-  if (!transport) {
-    throw new Error("SMTP is not configured. Please set SMTP_* in .env");
+  const resend = getResendClient();
+  if (!resend) {
+    throw new Error("Email is not configured. Please set RESEND_API_KEY in .env");
   }
 
-  const { SMTP_FROM, SMTP_USER } = process.env;
-  const from = SMTP_FROM || SMTP_USER;
+  const { EMAIL_FROM } = process.env;
+  const from = EMAIL_FROM || "Homio <onboarding@resend.dev>";
   const subject = "Your Homio verification code";
 
   const text = `Your Homio verification code is: ${code}\n\nThis code expires in 10 minutes.`;
@@ -44,7 +30,7 @@ async function sendOtpEmail({ to, code }) {
     </div>
   `;
 
-  await transport.sendMail({ from, to, subject, text, html });
+  await resend.emails.send({ from, to, subject, text, html });
 }
 
 module.exports = { sendOtpEmail };
