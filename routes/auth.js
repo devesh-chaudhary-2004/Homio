@@ -264,7 +264,8 @@ router.post(
 
 router.post("/logout", (req, res) => {
   res.clearCookie(COOKIE_NAME);
-  res.redirect("/listings");
+  setFlash(res, "success", "Logged out successfully.");
+  res.redirect("/login");
 });
 
 module.exports = router;

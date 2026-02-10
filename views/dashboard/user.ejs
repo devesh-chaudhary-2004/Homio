@@ -101,13 +101,27 @@
                     </div>
                   </div>
                 </div>
-                <% if (b.status === 'confirmed' && b.paymentStatus === 'paid') { %>
-                  <form method="POST" action="/listings/<%= b.listing?._id %>/bookings/<%= b._id %>/cancel" data-confirm="Are you sure you want to cancel this booking? Refund will be processed within 5-7 days.">
-                    <button class="btn btn-outline-danger btn-sm">
-                      <i class="fa-solid fa-xmark me-1"></i> Cancel
-                    </button>
-                  </form>
-                <% } %>
+                <div class="d-flex gap-2 flex-wrap">
+                  <% if (b.status === 'pending' && b.paymentStatus === 'pending') { %>
+                    <!-- Complete Payment button for pending bookings -->
+                    <a href="/listings/<%= b.listing?._id %>/bookings/<%= b._id %>/pay" class="btn btn-success btn-sm">
+                      <i class="fa-solid fa-credit-card me-1"></i> Complete Payment
+                    </a>
+                    <!-- Cancel pending booking -->
+                    <form method="POST" action="/listings/<%= b.listing?._id %>/bookings/<%= b._id %>/cancel" style="display:inline;" data-confirm="Are you sure you want to cancel this booking?">
+                      <button class="btn btn-outline-danger btn-sm">
+                        <i class="fa-solid fa-xmark me-1"></i> Cancel
+                      </button>
+                    </form>
+                  <% } else if (b.status === 'confirmed' && b.paymentStatus === 'paid') { %>
+                    <!-- Cancel confirmed booking -->
+                    <form method="POST" action="/listings/<%= b.listing?._id %>/bookings/<%= b._id %>/cancel" data-confirm="Are you sure you want to cancel this booking? Refund will be processed within 5-7 days.">
+                      <button class="btn btn-outline-danger btn-sm">
+                        <i class="fa-solid fa-xmark me-1"></i> Cancel
+                      </button>
+                    </form>
+                  <% } %>
+                </div>
               </div>
             <% } %>
           </div>

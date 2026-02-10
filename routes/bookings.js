@@ -178,6 +178,54 @@ router.post(
   })
 );
 
+// Resume payment for pending booking (User)
+router.get(
+  "/:bookingId/pay",
+  requireRole(["user"]),
+  wrapAsync(async (req, res) => {
+    const booking = await Booking.findById(req.params.bookingId).populate("listing");
+    if (!booking) {
+      setFlash(res, "danger", "Booking not found.");
+      return res.redirect("/dashboard");
+    }
+    if (booking.user.toString() !== req.user._id.toString()) {
+      setFlash(res, "danger", "Unauthorized action.");
+      return res.redirect("/dashboard");
+    }
+    if (booking.status !== "pending" || booking.paymentStatus !== "pending") {
+      setFlash(res, "warning", "This booking cannot be paid for.");
+      return res.redirect("/dashboard");
+    }
+
+    const listing = booking.listing;
+    const nights = booking.getNights();
+
+    // Create new Razorpay order (old one may have expired)
+    const razorpayOrder = await razorpay.orders.create({
+      amount: booking.totalAmount * 100,
+      currency: "INR",
+      receipt: `booking_${Date.now()}`,
+      notes: {
+        listingId: listing._id.toString(),
+        userId: req.user._id.toString(),
+      },
+    });
+
+    // Update booking with new order ID
+    booking.razorpayOrderId = razorpayOrder.id;
+    await booking.save();
+
+    res.render("bookings/payment.ejs", {
+      booking,
+      listing,
+      nights,
+      razorpayOrderId: razorpayOrder.id,
+      razorpayKeyId: RAZORPAY_KEY_ID,
+      user: req.user,
+    });
+  })
+);
+
 // Cancel booking (User)
 router.post(
   "/:bookingId/cancel",
