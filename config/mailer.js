@@ -1,7 +1,8 @@
 const nodemailer = require("nodemailer");
-const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS, SMTP_FROM } = process.env;
 
 function getTransport() {
+  const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS } = process.env;
+  
   if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
     return null;
   }
@@ -14,6 +15,10 @@ function getTransport() {
       user: SMTP_USER,
       pass: SMTP_PASS,
     },
+    // Timeouts to prevent hanging requests
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 }
 
@@ -23,6 +28,7 @@ async function sendOtpEmail({ to, code }) {
     throw new Error("SMTP is not configured. Please set SMTP_* in .env");
   }
 
+  const { SMTP_FROM, SMTP_USER } = process.env;
   const from = SMTP_FROM || SMTP_USER;
   const subject = "Your Homio verification code";
 
