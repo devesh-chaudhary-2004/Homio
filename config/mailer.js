@@ -1,25 +1,18 @@
-const { Resend } = require("resend");
-
-function getResendClient() {
-  const { RESEND_API_KEY } = process.env;
-  if (!RESEND_API_KEY) {
-    return null;
-  }
-  return new Resend(RESEND_API_KEY);
-}
+const brevo = require("@getbrevo/brevo");
 
 async function sendOtpEmail({ to, code }) {
-  const resend = getResendClient();
-  if (!resend) {
-    throw new Error("Email is not configured. Please set RESEND_API_KEY in .env");
+  const { BREVO_API_KEY, EMAIL_FROM_NAME, EMAIL_FROM_ADDRESS } = process.env;
+  
+  if (!BREVO_API_KEY) {
+    throw new Error("Email is not configured. Please set BREVO_API_KEY in .env");
   }
 
-  const { EMAIL_FROM } = process.env;
-  const from = EMAIL_FROM || "Homio <onboarding@resend.dev>";
-  const subject = "Your Homio verification code";
+  const apiInstance = new brevo.TransactionalEmailsApi();
+  apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, BREVO_API_KEY);
 
-  const text = `Your Homio verification code is: ${code}\n\nThis code expires in 10 minutes.`;
-  const html = `
+  const subject = "Your Homio verification code";
+  const textContent = `Your Homio verification code is: ${code}\n\nThis code expires in 10 minutes.`;
+  const htmlContent = `
     <div style="font-family: Arial, sans-serif; line-height: 1.5">
       <h2 style="margin: 0 0 8px">Verify your email</h2>
       <p style="margin: 0 0 12px">Your Homio verification code is:</p>
@@ -30,7 +23,17 @@ async function sendOtpEmail({ to, code }) {
     </div>
   `;
 
-  await resend.emails.send({ from, to, subject, text, html });
+  const sendSmtpEmail = new brevo.SendSmtpEmail();
+  sendSmtpEmail.subject = subject;
+  sendSmtpEmail.htmlContent = htmlContent;
+  sendSmtpEmail.textContent = textContent;
+  sendSmtpEmail.sender = { 
+    name: EMAIL_FROM_NAME || "Homio", 
+    email: EMAIL_FROM_ADDRESS || "noreply@homio.com" 
+  };
+  sendSmtpEmail.to = [{ email: to }];
+
+  await apiInstance.sendTransacEmail(sendSmtpEmail);
 }
 
 module.exports = { sendOtpEmail };

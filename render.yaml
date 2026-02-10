@@ -23,10 +23,12 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
-      - key: RESEND_API_KEY
+      - key: BREVO_API_KEY
         sync: false
-      - key: EMAIL_FROM
-        value: Homio <onboarding@resend.dev>
+      - key: EMAIL_FROM_NAME
+        value: Homio
+      - key: EMAIL_FROM_ADDRESS
+        sync: false
       - key: RAZORPAY_KEY_ID
         sync: false
       - key: RAZORPAY_KEY_SECRET
